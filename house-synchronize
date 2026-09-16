@@ -1,0 +1,10 @@
+#!/bin/bash
+# house-synchronize — apply home/dotfile configuration from house.lua
+set -e
+
+if [ "$EUID" -ne 0 ]; then
+    echo "To synchronize your home configuration, you must run this with superuser privileges."
+    exit 1
+fi
+
+exec lua /usr/lib/houses/house_sync.lua "$@"
