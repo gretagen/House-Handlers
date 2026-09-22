@@ -207,9 +207,9 @@ if arg and arg[0] and arg[0]:match("house_sync%.lua$") then
     io.stderr:write("No new generation created — fix errors and re-run, or boot a previous generation.\n")
   else
     print("Creating post-sync house generation...")
-    if not house_sync.shell("genzee create 'post-sync house'") then
-      io.stderr:write("[warn] genzee create failed — house is synced but no new boot entry was added.\n")
-      io.stderr:write("        Check btrfs layout (@ / @snapshots) and run: genzee create 'post-sync house'\n")
+    if not house_sync.shell("chronos create 'post-sync house'") then
+      io.stderr:write("[warn] chronos create failed — house is synced but no new boot entry was added.\n")
+      io.stderr:write("        Check btrfs layout (@ / @snapshots) and run: chronos create 'post-sync house'\n")
     end
     print("House synchronization complete.")
   end
