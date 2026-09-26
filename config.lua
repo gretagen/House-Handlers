@@ -35,6 +35,8 @@ local defaults = {
   },
 
   edit = {},
+  media = {},
+  command = {},
 }
 
 local schema = {
@@ -45,7 +47,7 @@ local schema = {
   boot = "table", init = "string",
   packages = "table", subspaces = "table", modules = "table", services = "table", users = "table",
   network = "table", fstab = "table",
-  ssh = "table", edit = "table",
+  ssh = "table", edit = "table", media = "table", command = "table",
 }
 
 local function deep_copy(t)

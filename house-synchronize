@@ -7,4 +7,4 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-exec lua /usr/lib/houses/house_sync.lua "$@"
+exec lua /usr/lib/house-handlers/house_sync.lua "$@"

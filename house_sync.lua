@@ -25,6 +25,12 @@ function house_sync.read_file(path)
   return c
 end
 
+function house_sync.file_exists(path)
+  local f = io.open(path, "r")
+  if f then f:close(); return true end
+  return false
+end
+
 function house_sync.ensure_dir(dir)
   local f = io.open(dir, "r")
   if f then f:close(); return true end
@@ -61,11 +67,27 @@ function house_sync.shell_output(cmd)
   return out:gsub("%s+$", "")
 end
 
+-- quote one argument for embedding inside /bin/bash -c "..."
+function house_sync.shell_quote(s)
+  return "'" .. s:gsub("'", "'\\''") .. "'"
+end
+
+-- run a user command under /bin/bash with output visible
+function house_sync.shell_live(cmd)
+  house_sync.vprint("bash: %s", cmd)
+  return os.execute("/bin/bash -c " .. house_sync.shell_quote(cmd))
+end
+
+-- silent probe under /bin/bash: true only when the command exits 0
+function house_sync.shell_ok(cmd)
+  return os.execute("/bin/bash -c " .. house_sync.shell_quote(cmd .. " 2>/dev/null")) == true
+end
+
 -- change builder
-function house_sync.change(section, generator, target, detail, apply_fn)
+function house_sync.change(type_, generator, target, detail, apply_fn)
   return {
-    type = "~",
-    section = section,
+    type = type_ or "~",
+    section = generator,
     generator = generator,
     target = target,
     detail = detail,
@@ -78,6 +100,8 @@ local generators = {}
 local generator_names = {
   "edit",
   "script",
+  "media",
+  "command",
 }
 
 house_sync.vprint("loading house generators...")
@@ -95,6 +119,7 @@ house_sync.vprint("%d generators loaded", #generators)
 -- collect all changes
 function house_sync.collect(cfg)
   local changes = {}
+  local seq = 0
   for _, gen in ipairs(generators) do
     local name = gen.name or "?"
     house_sync.vprint("planner '%s' running...", name)
@@ -102,15 +127,20 @@ function house_sync.collect(cfg)
     if ok and plans then
       house_sync.vprint("  → %d changes", #plans)
       for _, c in ipairs(plans) do
+        c.seq = seq
+        seq = seq + 1
         table.insert(changes, c)
       end
     else
       house_sync.vprint("  → ERROR: %s", tostring(plans))
     end
   end
+  -- stable sort: order by change type, keep declaration order within a type
   table.sort(changes, function(a, b)
     local order = { ["+"] = 1, ["~"] = 2, ["-"] = 3 }
-    return (order[a.type] or 0) < (order[b.type] or 0)
+    local oa, ob = order[a.type] or 0, order[b.type] or 0
+    if oa ~= ob then return oa < ob end
+    return (a.seq or 0) < (b.seq or 0)
   end)
   house_sync.vprint("total changes: %d", #changes)
   return changes
