@@ -11,7 +11,7 @@
 --   }
 --
 -- Commands run in listed order, each under /bin/bash (never /bin/sh, which
--- may map to a minimal shell on Haliade OS). When one command fails, the
+-- may map to a minimal shell on Haliade system). When one command fails, the
 -- rest of the sequence is skipped and the failure blocks the chronos
 -- generation.
 
