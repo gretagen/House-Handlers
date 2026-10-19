@@ -149,7 +149,7 @@ end
 -- print summary
 function house_sync.summary(changes)
   if #changes == 0 then
-    print("House is already synchronized — no changes required.")
+    print("House seems to be already synchronized, no changes required.")
     return
   end
   local groups = {}
@@ -159,7 +159,7 @@ function house_sync.summary(changes)
     table.insert(groups[s], c)
   end
   print()
-  print("  House Synchronize — Plan")
+  print("  House Synchronization plan")
   print("  " .. string.rep("=", 40))
   print()
   for s, entries in pairs(groups) do
@@ -195,7 +195,7 @@ function house_sync.apply(changes)
     end
   end
   if failures > 0 then
-    io.stderr:write(string.format("\n[warn] %d change(s) failed — review errors above\n", failures))
+    io.stderr:write(string.format("\n[warn] %d change(s) failed : review errors above\n", failures))
   end
   return true, failures
 end
@@ -238,10 +238,10 @@ if arg and arg[0] and arg[0]:match("house_sync%.lua$") then
   else
     print("Creating post-sync house generation...")
     if not house_sync.shell("chronos create 'post-sync house'") then
-      io.stderr:write("[warn] chronos create failed — house is synced but no new boot entry was added.\n")
+      io.stderr:write("[warn] chronos create failed : house is synced but no new boot entry was added.\n")
       io.stderr:write("        Check btrfs layout (@ / @snapshots) and run: chronos create 'post-sync house'\n")
     end
-    print("House synchronization complete.")
+    print("House synchronization completed.")
   end
 end
 
